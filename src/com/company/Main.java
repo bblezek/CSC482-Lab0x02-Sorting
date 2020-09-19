@@ -87,7 +87,7 @@ public class Main {
                     //If high array has been looped through up to high
                     } else if (highIndex >= high-mid && lowIndex < mid-low){
                         //Then loop through low array
-                        sortedArray[x] = highArray[lowIndex];
+                        sortedArray[x] = lowArray[lowIndex];
                         lowIndex++;
                     //Otherwise just place lower value as usual
                     } else if (lowArray[lowIndex] < highArray[highIndex]){
@@ -137,8 +137,8 @@ public class Main {
                 for (inner = 0; inner < k; inner++){
                     num = inputString[inner];
                     //Get appropriate digit
-                    num = num%(int)(Math.pow(2, 8*digit));
                     num = num/(int)(Math.pow(2, 8*(digit-1)));
+                    num = num%(int)(Math.pow(2, 8));
                     //Adding to how many numbers have that digit in the array
                     digitArray[num]++;
                 }
@@ -149,12 +149,12 @@ public class Main {
                 }
                 //Updating output list
                 //Iterating through inner array
-                for(inner = 0; inner < k; inner++){
+                for(inner = k-1; inner >= 0; inner--){
                     //Get value from array, calculate integer value
                     num = inputString[inner];
                     //Calculate appropriate digit
-                    num = num%(int)(Math.pow(2, 8*digit));
                     num = num/(int)(Math.pow(2, 8*(digit-1)));
+                    num = num%(int)(Math.pow(2, 8));
                     //Insert at new array according to index provided by digitArray
                     newLoc = digitArray[num]-1;
                     outputString[newLoc] = inputString[inner];
@@ -176,10 +176,10 @@ public class Main {
         return outputArray;
     }
 
-    public static void verificationTesting(){
+    public static boolean verificationTesting(){
         int N, k;
         char[][] inputArray, outputArray;
-        for(N = 10; N < 101; N = N*2){
+        for(N = 10; N < 51; N = N+10){
             for(k = 6; k < 48; k = k*2){
                 inputArray = generateTestList(N, k, 65, 90);
                 System.out.printf("Input array: \n");
@@ -190,6 +190,7 @@ public class Main {
                     printArray(outputArray, N, k);
                 } else {
                     System.out.printf("List not sorted!\n");
+                    return false;
                 }
                 inputArray = generateTestList(N, k, 65, 90);
                 System.out.printf("Input array: \n");
@@ -200,6 +201,7 @@ public class Main {
                     printArray(outputArray, N, k);
                 } else {
                     System.out.printf("List not sorted!\n");
+                    return false;
                 }
                 inputArray = generateTestList(N, k, 65, 90);
                 System.out.printf("Input array: \n");
@@ -210,20 +212,58 @@ public class Main {
                     printArray(outputArray, N, k);
                 } else {
                     System.out.printf("List not sorted!\n");
+                    return false;
                 }
             }
         }
-        /*for(N = 10; N < 100000001; N++){
+        for(N = 10; N < 10000001; N=N*10){
             for(k = 6; k < 48; k=k*2){
+                inputArray = generateTestList(N, k, 1, (int)Math.pow(2, 16));
+                System.out.printf("Generating list of length %d, with key width %d\n",
+                        N, k);
+                outputArray = insertionSort(inputArray, N, k);
+                System.out.printf("Sorting with insertion sort: \n");
+                if(isSorted(outputArray, N, k)){
+                    System.out.printf("Successfully sorted!\n");
+                } else {
+                    System.out.printf("Insertion sort failed!\n");
+                    return false;
+                }
 
+                inputArray = generateTestList(N, k, 1, (int)Math.pow(2, 16));
+                System.out.printf("Generating list of length %d, with key width %d\n",
+                        N, k);
+                outputArray = mergeSort(inputArray, N, k);
+                System.out.printf("Sorting with merge sort: \n");
+                if(isSorted(outputArray, N, k)){
+                    System.out.printf("Successfully sorted!\n");
+                } else {
+                    System.out.printf("Merge sort failed!\n");
+                    return false;
+
+                }
+
+                inputArray = generateTestList(N, k, 1, (int)Math.pow(2, 24));
+                System.out.printf("Generating list of length %d, with key width %d \n",
+                        N, k);
+                outputArray = radixSort(inputArray, N, k, 3);
+                System.out.printf("Sorting with radix sort: \n");
+                if(isSorted(outputArray, N, k)){
+                    System.out.printf("Successfully sorted!\n");
+                } else {
+                    System.out.printf("Radix sort failed!\n");
+                    return false;
+                }
             }
-        }*/
-        return;
+        }
+        return true;
     }
 
     public static void main(String[] args) {
 	// write your code here
-        verificationTesting();
+        if(verificationTesting()){
+            System.out.printf("All tests passed!\n");
+        };
 
 
 
