@@ -120,6 +120,68 @@ public class Main {
         }
         return outputArray;
     }
+
+    public static void recursiveQuickSort(char[] arrayToSort, int low, int high) {
+        char pivot;
+        int l = low +1;
+        int h = high - 1;
+        boolean pivotLocFound = false;
+        char temp;
+        //If there is one element in the array
+       /* if (low + 1 == high) {
+            return;
+        } else if (low + 2 == high) {
+            if (arrayToSort[low] > arrayToSort[high - 1]) {
+                temp = arrayToSort[low];
+                arrayToSort[low] = arrayToSort[high-1];
+                arrayToSort[high-1] = temp;
+            }
+        if (low==high) {
+            return;
+        } else {*/
+        if(low != high){
+            pivot = arrayToSort[low];
+            while(!pivotLocFound) {
+                while (l < high && arrayToSort[l] < pivot) {
+                    l++;
+                }
+                while (h > low && arrayToSort[h] > pivot) {
+                    h--;
+                }
+                if(l >= h){
+                    pivotLocFound = true;
+                } else {
+                    temp = arrayToSort[l];
+                    arrayToSort[l] = arrayToSort[h];
+                    arrayToSort[h] = temp;
+                }
+            }
+
+        arrayToSort[low] = arrayToSort[h];
+        arrayToSort[h] = pivot;
+        recursiveQuickSort(arrayToSort, low, h);
+        recursiveQuickSort(arrayToSort, h + 1, high);
+    }
+        return;
+    }
+
+    public static void quickSort(char[][] arrayToSort, int N, int k){
+        int outer, inner;
+        char[] inputArray = new char[k];
+        char[] outputArray = new char[k];
+        char[][] sortedArray = new char[N][k];
+        for(outer = 0; outer < N; outer++){
+            /*for(inner = 0; inner < k; inner++){
+                inputArray[inner] = arrayToSort[outer][inner];
+            }*/
+            recursiveQuickSort(arrayToSort[outer], 0, k);
+            /*for(inner = 0; inner < k; inner++){
+                arrayToSort[outer][inner] = inputArray[inner];
+            }*/
+        }
+        return;
+    }
+
     public static char[][] radixSort(char[][] arrayToSort, int N, int k, int d){
         int digit, inner, outer, num, y, newLoc;
         int[] digitArray = new int[256];
@@ -199,6 +261,17 @@ public class Main {
                 if(isSorted(outputArray, N, k)){
                     System.out.printf("Merge sorted list: \n");
                     printArray(outputArray, N, k);
+                } else {
+                    System.out.printf("List not sorted!\n");
+                    return false;
+                }
+                inputArray = generateTestList(N, k, 65, 90);
+                System.out.printf("Input array: \n");
+                printArray(inputArray, N, k);
+                quickSort(inputArray, N, k);
+                if(isSorted(inputArray, N, k)){
+                    System.out.printf("Quick sorted list: \n");
+                    printArray(inputArray, N, k);
                 } else {
                     System.out.printf("List not sorted!\n");
                     return false;
