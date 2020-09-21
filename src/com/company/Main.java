@@ -189,12 +189,11 @@ public class Main {
         return;
     }
 
-    public static char[][] radixSort(char[][] arrayToSort, int N, int k, int d){
+    public static void radixSort(char[][] arrayToSort, int N, int k, int d){
         int digit, inner, outer, num, y, newLoc;
         int[] digitArray = new int[256];
         char[] inputString = new char[k];
         char[] outputString = new char[k];
-        char[][] outputArray = new char[N][k];
         //Iterating through each outer array element of stringToSort
         for(outer = 0; outer < N; outer++) {
             for(y = 0; y < k; y++){
@@ -217,7 +216,9 @@ public class Main {
                     digitArray[y] = digitArray[y] + digitArray[y-1];
                 }
                 //Updating output list
-                //Iterating through inner array
+                //Iterating through input array backwards so that
+                //numbers with a higher "lower digit" are placed before
+                //those with the same "current digit" but a lower "lower digit"
                 for(inner = k-1; inner >= 0; inner--){
                     //Get value from array, calculate integer value
                     num = inputString[inner];
@@ -227,92 +228,96 @@ public class Main {
                     //Insert at new array according to index provided by digitArray
                     newLoc = digitArray[num]-1;
                     outputString[newLoc] = inputString[inner];
+                    //Decrementing index at that spot in the digit array
                     digitArray[num]--;
                 }
                 //Clear digit array for next round
                 for(y = 0; y < 256; y++){
                     digitArray[y] = 0;
                 }
+                //Copying output string to input string for next round
                 for(inner = 0; inner < k; inner++){
                     inputString[inner] = outputString[inner];
                 }
             }
             //Copying sorted array into final array
             for(y = 0; y < k; y++) {
-                outputArray[outer][y] = outputString[y];
+                arrayToSort[outer][y] = outputString[y];
             }
         }
-        return outputArray;
+        return;
     }
 
     public static boolean verificationTesting(){
         int N, k;
-        char[][] inputArray, outputArray;
+        char[][] charArray;
         //This loop is for visual verification
         for(N = 10; N < 51; N = N+10){
             for(k = 6; k < 48; k = k*2){
                 //Testing insertion sort
-                inputArray = generateTestList(N, k, 65, 90);
+                charArray = generateTestList(N, k, 65, 90);
                 System.out.printf("Input array: \n");
-                printArray(inputArray, N, k);
-                insertionSort(inputArray, N, k);
-                if(isSorted(inputArray, N, k)){
+                printArray(charArray, N, k);
+                insertionSort(charArray, N, k);
+                if(isSorted(charArray, N, k)){
                     System.out.printf("Insertion sorted list: \n");
-                    printArray(inputArray, N, k);
+                    printArray(charArray, N, k);
                 } else {
-                    System.out.printf("List not sorted!\n");
+                    System.out.printf("Insertion sort failed!\n");
                     return false;
                 }
 
                 //Testing merge sort
-                inputArray = generateTestList(N, k, 65, 90);
+                charArray = generateTestList(N, k, 65, 90);
                 System.out.printf("Input array: \n");
-                printArray(inputArray, N, k);
-                mergeSort(inputArray, N, k);
-                if(isSorted(inputArray, N, k)){
+                printArray(charArray, N, k);
+                mergeSort(charArray, N, k);
+                if(isSorted(charArray, N, k)){
                     System.out.printf("Merge sorted list: \n");
-                    printArray(inputArray, N, k);
+                    printArray(charArray, N, k);
                 } else {
-                    System.out.printf("List not sorted!\n");
+                    System.out.printf("Merge sort failed!\n");
                     return false;
                 }
 
                 //Testing quick sort
-                inputArray = generateTestList(N, k, 65, 90);
+                charArray = generateTestList(N, k, 65, 90);
                 System.out.printf("Input array: \n");
-                printArray(inputArray, N, k);
-                quickSort(inputArray, N, k);
-                if(isSorted(inputArray, N, k)){
+                printArray(charArray, N, k);
+                quickSort(charArray, N, k);
+                if(isSorted(charArray, N, k)){
                     System.out.printf("Quick sorted list: \n");
-                    printArray(inputArray, N, k);
+                    printArray(charArray, N, k);
                 } else {
-                    System.out.printf("List not sorted!\n");
+                    System.out.printf("Quick sort failed!\n");
                     return false;
                 }
-                inputArray = generateTestList(N, k, 65, 90);
+
+                //Testing radix sort
+                charArray = generateTestList(N, k, 65, 90);
                 System.out.printf("Input array: \n");
-                printArray(inputArray, N, k);
-                outputArray = radixSort(inputArray, N, k, 1);
-                if(isSorted(outputArray, N, k)){
+                printArray(charArray, N, k);
+                radixSort(charArray, N, k, 1);
+                if(isSorted(charArray, N, k)){
                     System.out.printf("Radix sorted list: \n");
-                    printArray(outputArray, N, k);
+                    printArray(charArray, N, k);
                 } else {
-                    System.out.printf("List not sorted!\n");
+                    System.out.printf("Radix sort failed!\n");
                     return false;
                 }
             }
         }
         //This loop is for testing successively larger lists
-        for(N = 10; N < 10000001; N=N*10){
+        for(N = 10; N < 1000001; N=N*10){
             for(k = 6; k < 48; k=k*2){
 
                 //Testing insertion sort
-                inputArray = generateTestList(N, k, 1, (int)Math.pow(2, 16));
+                charArray = generateTestList(N, k, 1, (int)Math.pow(2, 16));
                 System.out.printf("Generating list of length %d, with key width %d\n",
                         N, k);
-                insertionSort(inputArray, N, k);
+                insertionSort(charArray, N, k);
                 System.out.printf("Sorting with insertion sort: \n");
-                if(isSorted(inputArray, N, k)){
+                if(isSorted(charArray, N, k)){
                     System.out.printf("Successfully sorted!\n");
                 } else {
                     System.out.printf("Insertion sort failed!\n");
@@ -320,12 +325,12 @@ public class Main {
                 }
 
                 //Testing merge sort
-                inputArray = generateTestList(N, k, 1, (int)Math.pow(2, 16));
+                charArray = generateTestList(N, k, 1, (int)Math.pow(2, 16));
                 System.out.printf("Generating list of length %d, with key width %d\n",
                         N, k);
-                mergeSort(inputArray, N, k);
+                mergeSort(charArray, N, k);
                 System.out.printf("Sorting with merge sort: \n");
-                if(isSorted(inputArray, N, k)){
+                if(isSorted(charArray, N, k)){
                     System.out.printf("Successfully sorted!\n");
                 } else {
                     System.out.printf("Merge sort failed!\n");
@@ -333,12 +338,12 @@ public class Main {
                 }
 
                 //Testing quick sort
-                inputArray = generateTestList(N, k, 1, (int)Math.pow(2, 16));
+                charArray = generateTestList(N, k, 1, (int)Math.pow(2, 16));
                 System.out.printf("Generating list of length %d, with key width %d\n",
                         N, k);
-                quickSort(inputArray, N, k);
+                quickSort(charArray, N, k);
                 System.out.printf("Sorting with quick sort: \n");
-                if(isSorted(inputArray, N, k)){
+                if(isSorted(charArray, N, k)){
                     System.out.printf("Successfully sorted!\n");
                 } else {
                     System.out.printf("Quick sort failed!\n");
@@ -346,12 +351,12 @@ public class Main {
                 }
 
                 //Testing radix sort
-                inputArray = generateTestList(N, k, 1, (int)Math.pow(2, 24));
+                charArray = generateTestList(N, k, 1, (int)Math.pow(2, 24));
                 System.out.printf("Generating list of length %d, with key width %d \n",
                         N, k);
-                outputArray = radixSort(inputArray, N, k, 3);
+                radixSort(charArray, N, k, 3);
                 System.out.printf("Sorting with radix sort: \n");
-                if(isSorted(outputArray, N, k)){
+                if(isSorted(charArray, N, k)){
                     System.out.printf("Successfully sorted!\n");
                 } else {
                     System.out.printf("Radix sort failed!\n");
@@ -361,6 +366,7 @@ public class Main {
         }
         return true;
     }
+
 
     public static void main(String[] args) {
 	// write your code here
