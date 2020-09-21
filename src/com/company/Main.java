@@ -122,25 +122,15 @@ public class Main {
     }
 
     public static void recursiveQuickSort(char[] arrayToSort, int low, int high) {
-        char pivot;
-        int l = low +1;
-        int h = high - 1;
+        char pivot, temp;
+        int l, h;
         boolean pivotLocFound = false;
-        char temp;
-        //If there is one element in the array
-       /* if (low + 1 == high) {
+        if(high <= low){
             return;
-        } else if (low + 2 == high) {
-            if (arrayToSort[low] > arrayToSort[high - 1]) {
-                temp = arrayToSort[low];
-                arrayToSort[low] = arrayToSort[high-1];
-                arrayToSort[high-1] = temp;
-            }
-        if (low==high) {
-            return;
-        } else {*/
-        if(low != high){
+        } else {
             pivot = arrayToSort[low];
+            l = low + 1;
+            h = high;
             while(!pivotLocFound) {
                 while (l < high && arrayToSort[l] < pivot) {
                     l++;
@@ -154,12 +144,14 @@ public class Main {
                     temp = arrayToSort[l];
                     arrayToSort[l] = arrayToSort[h];
                     arrayToSort[h] = temp;
+                    l++;
+                    h--;
                 }
             }
 
         arrayToSort[low] = arrayToSort[h];
         arrayToSort[h] = pivot;
-        recursiveQuickSort(arrayToSort, low, h);
+        recursiveQuickSort(arrayToSort, low, h - 1);
         recursiveQuickSort(arrayToSort, h + 1, high);
     }
         return;
@@ -167,14 +159,11 @@ public class Main {
 
     public static void quickSort(char[][] arrayToSort, int N, int k){
         int outer, inner;
-        char[] inputArray = new char[k];
-        char[] outputArray = new char[k];
-        char[][] sortedArray = new char[N][k];
         for(outer = 0; outer < N; outer++){
             /*for(inner = 0; inner < k; inner++){
                 inputArray[inner] = arrayToSort[outer][inner];
             }*/
-            recursiveQuickSort(arrayToSort[outer], 0, k);
+            recursiveQuickSort(arrayToSort[outer], 0, k-1);
             /*for(inner = 0; inner < k; inner++){
                 arrayToSort[outer][inner] = inputArray[inner];
             }*/
@@ -334,6 +323,18 @@ public class Main {
 
     public static void main(String[] args) {
 	// write your code here
+        char[][] array = {{'X','C','V','P','H','S','R','G','T','Y','T','B'},
+                {'U','U','L','S','D','A','P','H','J','T','G','D'},
+                {'K','C','I','G','V','C','V','V','W','A','A','H'},
+                {'D','E','J','M','J','B','T','M','O','O','C','Y'},
+                {'N','N','N','I','I','M','G','T','G','W','H','C'},
+                {'Y','G','I','L','P','Y','J','B','X','K','V','T'},
+                {'U','R','S','Q','C','B','H','S','U','X','H','M'},
+                {'V','M','R','A','S','N','T','W','O','K','X','B'},
+                {'M','R','Y','N','E','P','Q','J','V','A','B','O'},
+                {'I','D','N','J','T','C','C','N','D','U','L','S'}};
+        quickSort(array,10, 12);
+        printArray(array, 10, 12);
         if(verificationTesting()){
             System.out.printf("All tests passed!\n");
         };
