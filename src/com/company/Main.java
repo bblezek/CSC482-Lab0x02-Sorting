@@ -5,6 +5,7 @@ import java.util.Random;
 
 public class Main {
 
+    //Generates lists of random characters with null bytes at the end
     public static char[][] generateTestList(int N, int k, int minV, int maxV){
         Random rand = new Random();
         char[][] outputArray = new char[N][k+1];
@@ -17,6 +18,7 @@ public class Main {
         return outputArray;
     }
 
+    //Function to test if the inner arrays of an array of arrays are sorted
     public static boolean isSorted(char[][] array, int N, int k){
         for(int outer = 0; outer < N; outer++) {
             for (int inner = 1; inner < k; inner++) {
@@ -27,6 +29,8 @@ public class Main {
         }
         return true;
     }
+
+    //Simple function to print an array of arrays
     public static void printArray(char[][] array, int N, int k){
         String str;
         for(int out = 0; out < N; out++){
@@ -37,21 +41,28 @@ public class Main {
         return;
     }
 
-    public static char[][] insertionSort(char[][] arrayToSort, int N, int k){
+    public static void insertionSort(char[][] arrayToSort, int N, int k){
         int outer, inner, x;
         char temp;
+        //Looping through each element, each char array, in the outer array
         for(outer = 0; outer < N; outer++){
+            //Looping through each element of the inner char arrays
             for(inner = 1; inner < k; inner++) {
                 x = inner;
                 temp = arrayToSort[outer][inner];
+                //Traverses down list from inner
+                //Tests whether temp is less than the next lowest element
+                //If it is, move that element up
                 while (x > 0 && temp < arrayToSort[outer][x-1]){
                     arrayToSort[outer][x] = arrayToSort[outer][x - 1];
                     x--;
                 }
+                //When temp is no longer less than the next lowest element
+                //Insert temp at x
                 arrayToSort[outer][x] = temp;
             }
         }
-        return arrayToSort;
+        return;
     }
 
     public static char[] recursiveMergeSort(char[] arrayToSort, int low, int high){
@@ -89,10 +100,12 @@ public class Main {
                         //Then loop through low array
                         sortedArray[x] = lowArray[lowIndex];
                         lowIndex++;
-                    //Otherwise just place lower value as usual
+                    //Otherwise, if lowArray value is less than highArray value
+                    //place low array value in sorted array
                     } else if (lowArray[lowIndex] < highArray[highIndex]){
                         sortedArray[x] = lowArray[lowIndex];
                         lowIndex++;
+                    //Or place high value in sorted array
                     } else {
                         sortedArray[x] = highArray[highIndex];
                         highIndex++;
@@ -102,71 +115,76 @@ public class Main {
         return sortedArray;
     }
 
-    public static char[][] mergeSort(char[][] arrayToSort, int N, int k){
-        char[][] outputArray = new char[N][k];
-        char[] sortedArray;
-        char[] inputArray = new char[k];
-        int outer, inner;
+    //This function simply calls recursiveMergeSort on each char array
+    //of the outer array of arrays
+    public static void mergeSort(char[][] arrayToSort, int N, int k){
+        int outer;
         for(outer = 0; outer < N; outer++) {
-            //Copy
-            for(inner = 0; inner < k; inner++){
-                inputArray[inner] = arrayToSort[outer][inner];
-            }
-            sortedArray = recursiveMergeSort(inputArray, 0, k);
-            //outputArray[outer] = sortedArray;
-            for (inner = 0; inner < k; inner++) {
-                outputArray[outer][inner] = sortedArray[inner];
-            }
+            arrayToSort[outer] = recursiveMergeSort(arrayToSort[outer], 0, k);
         }
-        return outputArray;
+        return;
     }
 
+    //NOTE: high is the highest array index, NOT the number of elements in the array
     public static void recursiveQuickSort(char[] arrayToSort, int low, int high) {
         char pivot, temp;
         int l, h;
         boolean pivotLocFound = false;
+        //If we are looking at only one element
+        //Or got passed in an "incorrect" value for high
         if(high <= low){
             return;
         } else {
+            //Pivot is lowest element of array
             pivot = arrayToSort[low];
             l = low + 1;
             h = high;
+            //Looping until we find where the pivot char should be placed
             while(!pivotLocFound) {
+                //"Scanning" left until we find an element larger than the pivot
                 while (l < high && arrayToSort[l] < pivot) {
                     l++;
                 }
+                //Scanning right until we find an element smaller than the pivot
                 while (h > low && arrayToSort[h] > pivot) {
                     h--;
                 }
+                //If l and h cross, we have found the new location for our pivot
                 if(l >= h){
                     pivotLocFound = true;
+                //Otherwise, we swap the elements at l and h
+                //And continue scanning until we find our pivot location
                 } else {
                     temp = arrayToSort[l];
                     arrayToSort[l] = arrayToSort[h];
                     arrayToSort[h] = temp;
+                    //Incrementing l and decrementing h since we just swapped
+                    //those elements and there is no need to "review" them
                     l++;
                     h--;
                 }
             }
-
-        arrayToSort[low] = arrayToSort[h];
-        arrayToSort[h] = pivot;
-        recursiveQuickSort(arrayToSort, low, h - 1);
-        recursiveQuickSort(arrayToSort, h + 1, high);
-    }
+            //Placing pivot at new location
+            arrayToSort[low] = arrayToSort[h];
+            arrayToSort[h] = pivot;
+            //Sorting elements to left and right of pivot
+            recursiveQuickSort(arrayToSort, low, h - 1);
+            recursiveQuickSort(arrayToSort, h + 1, high);
+        }
         return;
     }
 
+    //This function just calls recursiveQuickSort on each inner char array at
+    //each location in the array of char arrays
+    //This function and recursiveQuickSort are based heavily on the book's
+    //implementation of quickSort on pages 290 and 291
+    //I did attempt to figure out how to do this on my own, but after a few
+    //hours of work, I resorted to implementing my own version of the book's
+    //implementation
     public static void quickSort(char[][] arrayToSort, int N, int k){
-        int outer, inner;
+        int outer;
         for(outer = 0; outer < N; outer++){
-            /*for(inner = 0; inner < k; inner++){
-                inputArray[inner] = arrayToSort[outer][inner];
-            }*/
             recursiveQuickSort(arrayToSort[outer], 0, k-1);
-            /*for(inner = 0; inner < k; inner++){
-                arrayToSort[outer][inner] = inputArray[inner];
-            }*/
         }
         return;
     }
@@ -230,30 +248,36 @@ public class Main {
     public static boolean verificationTesting(){
         int N, k;
         char[][] inputArray, outputArray;
+        //This loop is for visual verification
         for(N = 10; N < 51; N = N+10){
             for(k = 6; k < 48; k = k*2){
+                //Testing insertion sort
                 inputArray = generateTestList(N, k, 65, 90);
                 System.out.printf("Input array: \n");
                 printArray(inputArray, N, k);
-                outputArray = insertionSort(inputArray, N, k);
-                if(isSorted(outputArray, N, k)){
+                insertionSort(inputArray, N, k);
+                if(isSorted(inputArray, N, k)){
                     System.out.printf("Insertion sorted list: \n");
-                    printArray(outputArray, N, k);
+                    printArray(inputArray, N, k);
                 } else {
                     System.out.printf("List not sorted!\n");
                     return false;
                 }
+
+                //Testing merge sort
                 inputArray = generateTestList(N, k, 65, 90);
                 System.out.printf("Input array: \n");
                 printArray(inputArray, N, k);
-                outputArray = mergeSort(inputArray, N, k);
-                if(isSorted(outputArray, N, k)){
+                mergeSort(inputArray, N, k);
+                if(isSorted(inputArray, N, k)){
                     System.out.printf("Merge sorted list: \n");
-                    printArray(outputArray, N, k);
+                    printArray(inputArray, N, k);
                 } else {
                     System.out.printf("List not sorted!\n");
                     return false;
                 }
+
+                //Testing quick sort
                 inputArray = generateTestList(N, k, 65, 90);
                 System.out.printf("Input array: \n");
                 printArray(inputArray, N, k);
@@ -278,33 +302,50 @@ public class Main {
                 }
             }
         }
+        //This loop is for testing successively larger lists
         for(N = 10; N < 10000001; N=N*10){
             for(k = 6; k < 48; k=k*2){
+
+                //Testing insertion sort
                 inputArray = generateTestList(N, k, 1, (int)Math.pow(2, 16));
                 System.out.printf("Generating list of length %d, with key width %d\n",
                         N, k);
-                outputArray = insertionSort(inputArray, N, k);
+                insertionSort(inputArray, N, k);
                 System.out.printf("Sorting with insertion sort: \n");
-                if(isSorted(outputArray, N, k)){
+                if(isSorted(inputArray, N, k)){
                     System.out.printf("Successfully sorted!\n");
                 } else {
                     System.out.printf("Insertion sort failed!\n");
                     return false;
                 }
 
+                //Testing merge sort
                 inputArray = generateTestList(N, k, 1, (int)Math.pow(2, 16));
                 System.out.printf("Generating list of length %d, with key width %d\n",
                         N, k);
-                outputArray = mergeSort(inputArray, N, k);
+                mergeSort(inputArray, N, k);
                 System.out.printf("Sorting with merge sort: \n");
-                if(isSorted(outputArray, N, k)){
+                if(isSorted(inputArray, N, k)){
                     System.out.printf("Successfully sorted!\n");
                 } else {
                     System.out.printf("Merge sort failed!\n");
                     return false;
-
                 }
 
+                //Testing quick sort
+                inputArray = generateTestList(N, k, 1, (int)Math.pow(2, 16));
+                System.out.printf("Generating list of length %d, with key width %d\n",
+                        N, k);
+                quickSort(inputArray, N, k);
+                System.out.printf("Sorting with quick sort: \n");
+                if(isSorted(inputArray, N, k)){
+                    System.out.printf("Successfully sorted!\n");
+                } else {
+                    System.out.printf("Quick sort failed!\n");
+                    return false;
+                }
+
+                //Testing radix sort
                 inputArray = generateTestList(N, k, 1, (int)Math.pow(2, 24));
                 System.out.printf("Generating list of length %d, with key width %d \n",
                         N, k);
@@ -323,23 +364,8 @@ public class Main {
 
     public static void main(String[] args) {
 	// write your code here
-        char[][] array = {{'X','C','V','P','H','S','R','G','T','Y','T','B'},
-                {'U','U','L','S','D','A','P','H','J','T','G','D'},
-                {'K','C','I','G','V','C','V','V','W','A','A','H'},
-                {'D','E','J','M','J','B','T','M','O','O','C','Y'},
-                {'N','N','N','I','I','M','G','T','G','W','H','C'},
-                {'Y','G','I','L','P','Y','J','B','X','K','V','T'},
-                {'U','R','S','Q','C','B','H','S','U','X','H','M'},
-                {'V','M','R','A','S','N','T','W','O','K','X','B'},
-                {'M','R','Y','N','E','P','Q','J','V','A','B','O'},
-                {'I','D','N','J','T','C','C','N','D','U','L','S'}};
-        quickSort(array,10, 12);
-        printArray(array, 10, 12);
         if(verificationTesting()){
             System.out.printf("All tests passed!\n");
-        };
-
-
-
+        }
     }
 }
