@@ -7,7 +7,7 @@ import java.util.Random;
 
 public class Main {
 
-    //Generates lists of random characters with null bytes at the end
+    //Generates array of N strings of k random characters with null bytes at the end
     public static String[] generateTestList(int N, int k, int minV, int maxV) {
         String[] outputArray = new String[N];
         Random rand = new Random();
@@ -23,15 +23,15 @@ public class Main {
         return outputArray;
     }
 
-    //Function to test if the inner arrays of an array of arrays are sorted
+    //Function to test if an array of Strings is sorted
     public static boolean isSorted(String[] array, int N) {
         for (int x = 0; x < N-1; x++) {
-            //If element at x is greater than element at x+1, return false
+            //If string at x is "greater than" string at x+1, return false
                 if (array[x].compareTo(array[x+1]) > 0) {
                     return false;
                 }
             }
-        //If elements are in order, return true
+        //If strings are in order, return true
         return true;
     }
 
@@ -49,18 +49,18 @@ public class Main {
     public static void insertionSort(String[] arrayToSort, int N) {
         int index, x;
         String temp;
-            //Looping through each element of the array
+            //Looping through each string of the array
             for (index = 1; index < N; index++) {
                 x = index;
                 temp = arrayToSort[index];
-                //Traverses down list from inner
-                //Tests whether temp is less than the next lowest element
-                //If it is, move that element up
+                //Traverses down list from index
+                //Tests whether temp is "less than" the string at the next lowest element
+                //If it is, move that string up
                 while (x > 0 && temp.compareTo(arrayToSort[x-1]) <= 0) {
                     arrayToSort[x] = arrayToSort[x-1];
                     x--;
                 }
-                //When temp is no longer less than the next lowest element
+                //When temp is no longer less than the next lowest string
                 //Insert temp at x
                 arrayToSort[x] = temp;
             }
@@ -69,6 +69,7 @@ public class Main {
 
     //Recursive merge sort function
     public static String[] mergeSort(String[] arrayToSort, int low, int high) {
+        //Calculating "mid" value to split array
         int mid = (int) Math.ceil((high - low) / 2) + low;
         String[] sortedArray = new String[high-low];
         //If there's only 2 elements in the array
@@ -95,12 +96,12 @@ public class Main {
             for (int x = 0; x < high - low; x++) {
                 //If low array has been looped through up to mid
                 if (lowIndex >= mid - low && highIndex < high - mid) {
-                    //Then loop through high array
+                    //Then loop through high array, adding elements to final list
                     sortedArray[x] = highArray[highIndex];
                     highIndex++;
                     //If high array has been looped through up to high
                 } else if (highIndex >= high - mid && lowIndex < mid - low) {
-                    //Then loop through low array
+                    //Then loop through low array, adding elements to final list
                     sortedArray[x] = lowArray[lowIndex];
                     lowIndex++;
                     //Otherwise, if lowArray value is less than highArray value
@@ -118,9 +119,11 @@ public class Main {
         return sortedArray;
     }
 
-    //NOTE: high is the highest array index, NOT the number of elements in the array
+    //Recursive quick sort function
+    //Sorts array "in place"
     public static void quickSort(String[] arrayToSort, int low, int high) {
         String pivot, temp;
+        //"Low" and "high" indices to work up from bottom and down from top
         int l, h;
         boolean pivotLocFound = false;
         //If we are looking at only one element
@@ -128,7 +131,7 @@ public class Main {
         if (high <= low) {
             return;
         } else {
-            //Pivot is lowest element of array
+            //Set pivot to lowest element of array
             pivot = arrayToSort[low];
             l = low + 1;
             h = high - 1;
@@ -168,21 +171,24 @@ public class Main {
     }
 
 
+    //Radix sort
+    //Doesn't return a value, as it updates arrayToSort to be inputArray at end of each iteration
     public static void radixSort(String[] arrayToSort, int N, int k, int d) {
         int stringIndex, digit, arrIndex, num, y, newLoc;
+        //Array to hold indices for each character
         int[] digitArray = new int[256];
         String[] sortedArray = new String[N];
-        //Iterate through each character
+        //Iterate through each character of the strings
         for(stringIndex = k-1; stringIndex >= 0; stringIndex--){
-            //Iterating through each digit for each outer array element
+            //Iterating through each "digit" for each character
             for (digit = 1; digit <= d; digit++) {
-                //Iterating through String array, examining stringIndex element of each String
+                //Iterating through String array, examining stringIndex character of each String
                 for (arrIndex = 0; arrIndex < N; arrIndex++) {
                     num = arrayToSort[arrIndex].charAt(stringIndex);
                     //Get appropriate digit
                     num = num / (int) (Math.pow(2, 8 * (digit - 1)));
                     num = num % (int) (Math.pow(2, 8));
-                    //Adding to how many numbers have that digit in the array
+                    //Incrementing digitArray at that location
                     digitArray[num]++;
                 }
                 //Accumulating sums in digit array to make sure indices are right
@@ -220,13 +226,15 @@ public class Main {
         return;
     }
 
+    //Function to test each sort to make sure it returns correct results
     public static boolean verificationTesting() {
         int N, k;
         String[] stringArray;
         //This loop is for visual verification
-        for (N = 10; N < 51; N = N + 10) {
-            for (k = 6; k < 48; k = k * 2) {
+        for (N = 10; N <= 40; N = N + 10) {
+            for (k = 6; k <= 48; k = k * 2) {
                 //Testing insertion sort
+                //The visual tests are just with capital letters for ease of visual verification
                 stringArray = generateTestList(N, k, 65, 90);
                 System.out.printf("Input array: \n");
                 printArray(stringArray, N);
@@ -281,8 +289,8 @@ public class Main {
         }
 
         //This loop is for testing successively larger lists
-        for (N = 10; N < 1000001; N = N * 10) {
-            for (k = 6; k < 48; k = k * 2) {
+        for (N = 10; N <= 10000; N = N * 10) {
+            for (k = 6; k <= 48; k = k * 2) {
 
                 //Testing insertion sort
                 stringArray = generateTestList(N, k, 1, (int) Math.pow(2, 16));
@@ -340,19 +348,22 @@ public class Main {
         return true;
     }
 
+    //Function to retrieve CPU time
     public static long getCpuTime() {
         ThreadMXBean bean = ManagementFactory.getThreadMXBean();
         return bean.isCurrentThreadCpuTimeSupported() ?
                 bean.getCurrentThreadCpuTime() : 0L;
     }
 
+    //Function to run timed tests for each search and print table
     public static void runTimeTests() {
         //Looping variables
         //prevTimeLoc is for our previous time array for each value of k
         int N, k, x, prevTimeLoc;
+
         //Keeps track of how long each run of N takes
         long lastTime = 0;
-        long maxTime = 2400000000L; //240000000000L
+        long maxTime = 120000000000L;
 
         //averageTime accumulates times for all runs of a particular value of N and k
         //It is then divided by timesToRun to calculate average
@@ -409,13 +420,15 @@ public class Main {
                 prevTime[prevTimeLoc] = averageTime;
                 prevTimeLoc++;
             }
+            //Doubling ratio should be 4, because the time complexity is N^2 so
+            // it will be N^2/ (N/2)^2 = N^2/ (N^2)/4)) = 4
             System.out.printf("%15d \n", 4);
             lastTime = getCpuTime() - lastTime;
         }
 
-        //Testing merge sort times
+        //Testing merge sort
         System.out.printf("Merge Sort: \n");
-        //Printing first value of row
+        //Printing first row
         System.out.printf("%31s %31s %31s %31s\n", "k=6", "k=12", "k=24", "k=48");
         System.out.printf("%31s %15s %15s %15s %15s %15s %15s %15s %15s\n", "Time", "Doubling Ratio", "Time",
                 "Doubling Ratio", "Time", "Doubling Ratio", "Time", "Doubling Ratio", "Predicted");
@@ -439,7 +452,7 @@ public class Main {
                 for (x = 0; x < timesToRun; x++) {
                     array = generateTestList(N, k, 1, (int) Math.pow(2, (8 * d)));
                     timeBefore = getCpuTime();
-                    mergeSort(array, N, k);
+                    array = mergeSort(array, 0, N);
                     timeAfter = getCpuTime();
                     averageTime = averageTime + timeAfter - timeBefore;
                 }
@@ -465,6 +478,7 @@ public class Main {
             prevTime[x] = 0;
         }
         lastTime = 0;
+
         //Testing quick sort times
         System.out.printf("Quick Sort: \n");
         //Printing first value of row
@@ -486,7 +500,7 @@ public class Main {
                 for (x = 0; x < timesToRun; x++) {
                     array = generateTestList(N, k, 1, (int) Math.pow(2, (8 * d)));
                     timeBefore = getCpuTime();
-                    quickSort(array, N, k);
+                    quickSort(array, 0, N);
                     timeAfter = getCpuTime();
                     averageTime = averageTime + timeAfter - timeBefore;
                 }
@@ -509,7 +523,7 @@ public class Main {
 
         //Testing radix sort times
 
-        //Testing different digits
+        //Testing different digit values
         for (int digit = 1; digit <= 5; digit++) {
             if (digit == 5) {
                 digit = 8;
@@ -522,6 +536,7 @@ public class Main {
             System.out.printf("%64s %46s %47s\n", "Doubling", "Doubling", "Doubling", "Doubling");
             System.out.printf("%15s %47s %47s %47s\n", "N", "Ratio", "Ratio", "Ratio", "Ratio");
             lastTime = 0;
+
             //Looping through N
             for (N = 1; lastTime < maxTime; N = N * 2) {
                 System.out.printf("%15d ", N);
@@ -570,6 +585,6 @@ public class Main {
         if (verificationTesting()) {
             System.out.printf("All tests passed!\n");
         }
-        //runTimeTests();
+        runTimeTests();
     }
 }
