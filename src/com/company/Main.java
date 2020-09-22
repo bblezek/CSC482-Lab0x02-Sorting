@@ -121,6 +121,9 @@ public class Main {
 
     //Recursive quick sort function
     //Sorts array "in place"
+    //I ended up modifying the textbook's code (Algorithms, Fourth Edition by Sedgewick and Wayne)
+    // for quickSort, as I could not figure it out after a couple hours
+    //of trying - pages 288-291
     public static void quickSort(String[] arrayToSort, int low, int high) {
         String pivot, temp;
         //"Low" and "high" indices to work up from bottom and down from top
@@ -289,7 +292,7 @@ public class Main {
         }
 
         //This loop is for testing successively larger lists
-        for (N = 10; N <= 10000; N = N * 10) {
+        for (N = 10; N <= 100000; N = N * 10) {
             for (k = 6; k <= 48; k = k * 2) {
 
                 //Testing insertion sort
@@ -361,7 +364,7 @@ public class Main {
         //prevTimeLoc is for our previous time array for each value of k
         int N, k, x, prevTimeLoc;
 
-        //Keeps track of how long each run of N takes
+        //Keeps track of how long each run of N takes - maxTime is set to 2 minutes to produce + print one row of a table
         long lastTime = 0;
         long maxTime = 120000000000L;
 
@@ -523,16 +526,19 @@ public class Main {
 
         //Testing radix sort times
 
-        //Testing different digit values
+        //Testing different digit values - 1, 2, 3, 4, and 8
         for (int digit = 1; digit <= 5; digit++) {
             if (digit == 5) {
                 digit = 8;
             }
             System.out.printf("Radix - %d \n", digit);
             //Printing first value of row
-            System.out.printf("%31s %31s %31s %31s\n", "k=6", "k=12", "k=24", "k=48");
-            System.out.printf("%31s %15s %15s %15s %15s %15s %15s %15s %15s\n", "Time", "Doubling Ratio", "Predicted",
-                    "Time", "Doubling Ratio", "Predicted", "Time", "Doubling Ratio", "Predicted");
+            System.out.printf("%31s %47s %47s %47s\n", "k=6", "k=12", "k=24", "k=48");
+            System.out.printf("%31s %15s %15s %15s %15s %15s %15s %15s %15s %15s %15s %15s\n",
+                    "Time", "Doubling Ratio", "Predicted",
+                    "Time", "Doubling Ratio", "Predicted",
+                    "Time", "Doubling Ratio", "Predicted",
+                    "Time", "Doubling Ratio", "Predicted");
             System.out.printf("%64s %46s %47s\n", "Doubling", "Doubling", "Doubling", "Doubling");
             System.out.printf("%15s %47s %47s %47s\n", "N", "Ratio", "Ratio", "Ratio", "Ratio");
             lastTime = 0;
@@ -559,16 +565,16 @@ public class Main {
                         //Calculating place in array of previous time values to get average time from last value of N
                         //And then replace it with the new value
                         if (N == 1) {
-                            System.out.printf("%15d %15s %15s", averageTime, "na", "na");
+                            System.out.printf("%15d %15s %15s ", averageTime, "na", "na");
                         } else {
-                            System.out.printf("%15d %15.3f %15d", averageTime,
+                            System.out.printf("%15d %15.3f %15d ", averageTime,
                                     (float) averageTime / prevTime[prevTimeLoc], ((N * k) / ((N / 2) * k)));
                         }
                         //Update prevTime array
                         prevTime[prevTimeLoc] = averageTime;
                         prevTimeLoc++;
                     } else {
-                        System.out.printf("%15s %15s", "na", "na");
+                        System.out.printf("%15s %15s %15s ", "na", "na", "na");
                     }
                 }
                 System.out.printf("\n");
