@@ -8,72 +8,73 @@ import java.util.Random;
 public class Main {
 
     //Generates lists of random characters with null bytes at the end
-    public static char[][] generateTestList(int N, int k, int minV, int maxV) {
+    public static String[] generateTestList(int N, int k, int minV, int maxV) {
+        String[] outputArray = new String[N];
         Random rand = new Random();
-        char[][] outputArray = new char[N][k + 1];
+        //New string is of length k+1 to make room for null byte
+        char[] newString = new char[k+1];
         for (int outer = 0; outer < N; outer++) {
             for (int inner = 0; inner < k; inner++) {
-                outputArray[outer][inner] = (char) (minV + rand.nextInt(maxV - minV));
+                newString[inner] = (char) (minV + rand.nextInt(maxV - minV));
             }
-            outputArray[outer][k] = '\0';
+            newString[k] = '\0';
+            outputArray[outer] = String.valueOf(newString);
         }
         return outputArray;
     }
 
     //Function to test if the inner arrays of an array of arrays are sorted
-    public static boolean isSorted(char[][] array, int N, int k) {
-        for (int outer = 0; outer < N; outer++) {
-            for (int inner = 1; inner < k; inner++) {
-                if (array[outer][inner] < array[outer][inner - 1]) {
+    public static boolean isSorted(String[] array, int N) {
+        for (int x = 0; x < N-1; x++) {
+            //If element at x is greater than element at x+1, return false
+                if (array[x].compareTo(array[x+1]) > 0) {
                     return false;
                 }
             }
-        }
+        //If elements are in order, return true
         return true;
     }
 
-    //Simple function to print an array of arrays
-    public static void printArray(char[][] array, int N) {
-        String str;
-        for (int out = 0; out < N; out++) {
-            str = String.valueOf(array[out]);
-            System.out.printf("%s\t", str);
+    //Simple function to print an array of strings
+    public static void printArray(String[] array, int N) {
+        //Iterates through array, printing each string
+        for (int x = 0; x < N; x++) {
+            System.out.printf("%s\t", array[x]);
         }
         System.out.printf("\n");
         return;
     }
 
-    public static void insertionSort(char[][] arrayToSort, int N, int k) {
-        int outer, inner, x;
-        char temp;
-        //Looping through each element, each char array, in the outer array
-        for (outer = 0; outer < N; outer++) {
-            //Looping through each element of the inner char arrays
-            for (inner = 1; inner < k; inner++) {
-                x = inner;
-                temp = arrayToSort[outer][inner];
+    //Insertion sort function
+    public static void insertionSort(String[] arrayToSort, int N) {
+        int index, x;
+        String temp;
+            //Looping through each element of the array
+            for (index = 1; index < N; index++) {
+                x = index;
+                temp = arrayToSort[index];
                 //Traverses down list from inner
                 //Tests whether temp is less than the next lowest element
                 //If it is, move that element up
-                while (x > 0 && temp < arrayToSort[outer][x - 1]) {
-                    arrayToSort[outer][x] = arrayToSort[outer][x - 1];
+                while (x > 0 && temp.compareTo(arrayToSort[x-1]) <= 0) {
+                    arrayToSort[x] = arrayToSort[x-1];
                     x--;
                 }
                 //When temp is no longer less than the next lowest element
                 //Insert temp at x
-                arrayToSort[outer][x] = temp;
+                arrayToSort[x] = temp;
             }
-        }
         return;
     }
 
-    public static char[] recursiveMergeSort(char[] arrayToSort, int low, int high) {
+    //Recursive merge sort function
+    public static String[] mergeSort(String[] arrayToSort, int low, int high) {
         int mid = (int) Math.ceil((high - low) / 2) + low;
-        char[] sortedArray = new char[high - low];
+        String[] sortedArray = new String[high-low];
         //If there's only 2 elements in the array
         if (high - low == 2) {
             //Put them in the appropriate order
-            if (arrayToSort[low] > arrayToSort[high - 1]) {
+            if (arrayToSort[low].compareTo(arrayToSort[low+1]) > 0) {
                 sortedArray[0] = arrayToSort[high - 1];
                 sortedArray[1] = arrayToSort[low];
             } else {
@@ -86,8 +87,8 @@ public class Main {
             //If there's more than two elements
         } else if (high - low > 2) {
             //Recursively sort each half
-            char[] lowArray = recursiveMergeSort(arrayToSort, low, mid);
-            char[] highArray = recursiveMergeSort(arrayToSort, mid, high);
+            String[] lowArray = mergeSort(arrayToSort, low, mid);
+            String[] highArray = mergeSort(arrayToSort, mid, high);
             int lowIndex = 0;
             int highIndex = 0;
             //And then merge
@@ -104,7 +105,7 @@ public class Main {
                     lowIndex++;
                     //Otherwise, if lowArray value is less than highArray value
                     //place low array value in sorted array
-                } else if (lowArray[lowIndex] < highArray[highIndex]) {
+                } else if (lowArray[lowIndex].compareTo(highArray[highIndex]) < 0) {
                     sortedArray[x] = lowArray[lowIndex];
                     lowIndex++;
                     //Or place high value in sorted array
@@ -117,19 +118,9 @@ public class Main {
         return sortedArray;
     }
 
-    //This function simply calls recursiveMergeSort on each char array
-    //of the outer array of arrays
-    public static void mergeSort(char[][] arrayToSort, int N, int k) {
-        int outer;
-        for (outer = 0; outer < N; outer++) {
-            arrayToSort[outer] = recursiveMergeSort(arrayToSort[outer], 0, k);
-        }
-        return;
-    }
-
     //NOTE: high is the highest array index, NOT the number of elements in the array
-    public static void recursiveQuickSort(char[] arrayToSort, int low, int high) {
-        char pivot, temp;
+    public static void quickSort(String[] arrayToSort, int low, int high) {
+        String pivot, temp;
         int l, h;
         boolean pivotLocFound = false;
         //If we are looking at only one element
@@ -140,15 +131,15 @@ public class Main {
             //Pivot is lowest element of array
             pivot = arrayToSort[low];
             l = low + 1;
-            h = high;
+            h = high - 1;
             //Looping until we find where the pivot char should be placed
             while (!pivotLocFound) {
                 //"Scanning" left until we find an element larger than the pivot
-                while (l < high && arrayToSort[l] < pivot) {
+                while (l < high-1 && arrayToSort[l].compareTo(pivot) < 0) {
                     l++;
                 }
                 //Scanning right until we find an element smaller than the pivot
-                while (h > low && arrayToSort[h] > pivot) {
+                while (h > low && arrayToSort[h].compareTo(pivot) > 0) {
                     h--;
                 }
                 //If l and h cross, we have found the new location for our pivot
@@ -170,42 +161,24 @@ public class Main {
             arrayToSort[low] = arrayToSort[h];
             arrayToSort[h] = pivot;
             //Sorting elements to left and right of pivot
-            recursiveQuickSort(arrayToSort, low, h - 1);
-            recursiveQuickSort(arrayToSort, h + 1, high);
+            quickSort(arrayToSort, low, h);
+            quickSort(arrayToSort, h + 1, high);
         }
         return;
     }
 
-    //This function just calls recursiveQuickSort on each inner char array at
-    //each location in the array of char arrays
-    //This function and recursiveQuickSort are based heavily on the book's
-    //implementation of quickSort on pages 290 and 291
-    //I did attempt to figure out how to do this on my own, but after a few
-    //hours of work, I resorted to implementing my own version of the book's
-    //implementation
-    public static void quickSort(char[][] arrayToSort, int N, int k) {
-        int outer;
-        for (outer = 0; outer < N; outer++) {
-            recursiveQuickSort(arrayToSort[outer], 0, k - 1);
-        }
-        return;
-    }
 
-    public static void radixSort(char[][] arrayToSort, int N, int k, int d) {
-        int digit, inner, outer, num, y, newLoc;
+    public static void radixSort(String[] arrayToSort, int N, int k, int d) {
+        int stringIndex, digit, arrIndex, num, y, newLoc;
         int[] digitArray = new int[256];
-        char[] inputString = new char[k];
-        char[] outputString = new char[k];
-        //Iterating through each outer array element of stringToSort
-        for (outer = 0; outer < N; outer++) {
-            for (y = 0; y < k; y++) {
-                inputString[y] = arrayToSort[outer][y];
-            }
+        String[] sortedArray = new String[N];
+        //Iterate through each character
+        for(stringIndex = k-1; stringIndex >= 0; stringIndex--){
             //Iterating through each digit for each outer array element
             for (digit = 1; digit <= d; digit++) {
-                //Iterating through inner array elements
-                for (inner = 0; inner < k; inner++) {
-                    num = inputString[inner];
+                //Iterating through String array, examining stringIndex element of each String
+                for (arrIndex = 0; arrIndex < N; arrIndex++) {
+                    num = arrayToSort[arrIndex].charAt(stringIndex);
                     //Get appropriate digit
                     num = num / (int) (Math.pow(2, 8 * (digit - 1)));
                     num = num % (int) (Math.pow(2, 8));
@@ -221,15 +194,15 @@ public class Main {
                 //Iterating through input array backwards so that
                 //numbers with a higher "lower digit" are placed before
                 //those with the same "current digit" but a lower "lower digit"
-                for (inner = k - 1; inner >= 0; inner--) {
+                for (arrIndex = N - 1; arrIndex >= 0; arrIndex--) {
                     //Get value from array, calculate integer value
-                    num = inputString[inner];
+                    num = arrayToSort[arrIndex].charAt(stringIndex);
                     //Calculate appropriate digit
                     num = num / (int) (Math.pow(2, 8 * (digit - 1)));
                     num = num % (int) (Math.pow(2, 8));
                     //Insert at new array according to index provided by digitArray
                     newLoc = digitArray[num] - 1;
-                    outputString[newLoc] = inputString[inner];
+                    sortedArray[newLoc] = arrayToSort[arrIndex];
                     //Decrementing index at that spot in the digit array
                     digitArray[num]--;
                 }
@@ -238,13 +211,10 @@ public class Main {
                     digitArray[y] = 0;
                 }
                 //Copying output string to input string for next round
-                for (inner = 0; inner < k; inner++) {
-                    inputString[inner] = outputString[inner];
+                //Changing original array so no return value
+                for (arrIndex = 0; arrIndex < N; arrIndex++) {
+                    arrayToSort[arrIndex] = sortedArray[arrIndex];
                 }
-            }
-            //Copying sorted array into final array
-            for (y = 0; y < k; y++) {
-                arrayToSort[outer][y] = outputString[y];
             }
         }
         return;
@@ -252,74 +222,75 @@ public class Main {
 
     public static boolean verificationTesting() {
         int N, k;
-        char[][] charArray;
+        String[] stringArray;
         //This loop is for visual verification
         for (N = 10; N < 51; N = N + 10) {
             for (k = 6; k < 48; k = k * 2) {
                 //Testing insertion sort
-                charArray = generateTestList(N, k, 65, 90);
+                stringArray = generateTestList(N, k, 65, 90);
                 System.out.printf("Input array: \n");
-                printArray(charArray, N);
-                insertionSort(charArray, N, k);
-                if (isSorted(charArray, N, k)) {
+                printArray(stringArray, N);
+                insertionSort(stringArray, N);
+                if (isSorted(stringArray, N)) {
                     System.out.printf("Insertion sorted list: \n");
-                    printArray(charArray, N);
+                    printArray(stringArray, N);
                 } else {
                     System.out.printf("Insertion sort failed!\n");
                     return false;
                 }
 
                 //Testing merge sort
-                charArray = generateTestList(N, k, 65, 90);
+                stringArray = generateTestList(N, k, 65, 90);
                 System.out.printf("Input array: \n");
-                printArray(charArray, N);
-                mergeSort(charArray, N, k);
-                if (isSorted(charArray, N, k)) {
+                printArray(stringArray, N);
+                stringArray = mergeSort(stringArray, 0, N);
+                if (isSorted(stringArray, N)) {
                     System.out.printf("Merge sorted list: \n");
-                    printArray(charArray, N);
+                    printArray(stringArray, N);
                 } else {
                     System.out.printf("Merge sort failed!\n");
                     return false;
                 }
 
                 //Testing quick sort
-                charArray = generateTestList(N, k, 65, 90);
+                stringArray = generateTestList(N, k, 65, 90);
                 System.out.printf("Input array: \n");
-                printArray(charArray, N);
-                quickSort(charArray, N, k);
-                if (isSorted(charArray, N, k)) {
+                printArray(stringArray, N);
+                quickSort(stringArray, 0, N);
+                if (isSorted(stringArray, N)) {
                     System.out.printf("Quick sorted list: \n");
-                    printArray(charArray, N);
+                    printArray(stringArray, N);
                 } else {
                     System.out.printf("Quick sort failed!\n");
                     return false;
                 }
 
                 //Testing radix sort
-                charArray = generateTestList(N, k, 65, 90);
+                stringArray = generateTestList(N, k, 65, 90);
                 System.out.printf("Input array: \n");
-                printArray(charArray, N);
-                radixSort(charArray, N, k, 1);
-                if (isSorted(charArray, N, k)) {
+                printArray(stringArray, N);
+                radixSort(stringArray, N, k, 1);
+                if (isSorted(stringArray, N)) {
                     System.out.printf("Radix sorted list: \n");
-                    printArray(charArray, N);
+                    printArray(stringArray, N);
                 } else {
                     System.out.printf("Radix sort failed!\n");
                     return false;
                 }
             }
         }
+
         //This loop is for testing successively larger lists
         for (N = 10; N < 1000001; N = N * 10) {
             for (k = 6; k < 48; k = k * 2) {
 
                 //Testing insertion sort
-                charArray = generateTestList(N, k, 1, (int) Math.pow(2, 16));
+                stringArray = generateTestList(N, k, 1, (int) Math.pow(2, 16));
                 System.out.printf("Generating list of length %d, with key width %d\n",
                         N, k);
-                insertionSort(charArray, N, k);
+                insertionSort(stringArray, N);
                 System.out.printf("Sorting with insertion sort: \n");
-                if (isSorted(charArray, N, k)) {
+                if (isSorted(stringArray, N)) {
                     System.out.printf("Successfully sorted!\n");
                 } else {
                     System.out.printf("Insertion sort failed!\n");
@@ -327,12 +298,12 @@ public class Main {
                 }
 
                 //Testing merge sort
-                charArray = generateTestList(N, k, 1, (int) Math.pow(2, 16));
+                stringArray = generateTestList(N, k, 1, (int) Math.pow(2, 16));
                 System.out.printf("Generating list of length %d, with key width %d\n",
                         N, k);
-                mergeSort(charArray, N, k);
+                stringArray = mergeSort(stringArray, 0, N);
                 System.out.printf("Sorting with merge sort: \n");
-                if (isSorted(charArray, N, k)) {
+                if (isSorted(stringArray, N)) {
                     System.out.printf("Successfully sorted!\n");
                 } else {
                     System.out.printf("Merge sort failed!\n");
@@ -340,12 +311,12 @@ public class Main {
                 }
 
                 //Testing quick sort
-                charArray = generateTestList(N, k, 1, (int) Math.pow(2, 16));
+                stringArray = generateTestList(N, k, 1, (int) Math.pow(2, 16));
                 System.out.printf("Generating list of length %d, with key width %d\n",
                         N, k);
-                quickSort(charArray, N, k);
+                quickSort(stringArray, 0, N);
                 System.out.printf("Sorting with quick sort: \n");
-                if (isSorted(charArray, N, k)) {
+                if (isSorted(stringArray, N)) {
                     System.out.printf("Successfully sorted!\n");
                 } else {
                     System.out.printf("Quick sort failed!\n");
@@ -353,12 +324,12 @@ public class Main {
                 }
 
                 //Testing radix sort
-                charArray = generateTestList(N, k, 1, (int) Math.pow(2, 24));
+                stringArray = generateTestList(N, k, 1, (int) Math.pow(2, 24));
                 System.out.printf("Generating list of length %d, with key width %d \n",
                         N, k);
-                radixSort(charArray, N, k, 3);
+                radixSort(stringArray, N, k, 3);
                 System.out.printf("Sorting with radix sort: \n");
-                if (isSorted(charArray, N, k)) {
+                if (isSorted(stringArray, N)) {
                     System.out.printf("Successfully sorted!\n");
                 } else {
                     System.out.printf("Radix sort failed!\n");
@@ -392,7 +363,7 @@ public class Main {
         int d = 3;
 
         //Array to be generated and sorted
-        char[][] array;
+        String[] array;
 
         //Number of times to run each combination of N and k
         int timesToRun = 20;
@@ -421,7 +392,7 @@ public class Main {
                 for (x = 0; x < timesToRun; x++) {
                     array = generateTestList(N, k, 1, (int) Math.pow(2, (8 * d)));
                     timeBefore = getCpuTime();
-                    insertionSort(array, N, k);
+                    insertionSort(array, N);
                     timeAfter = getCpuTime();
                     averageTime = averageTime + timeAfter - timeBefore;
                 }
@@ -573,9 +544,10 @@ public class Main {
                         //Calculating place in array of previous time values to get average time from last value of N
                         //And then replace it with the new value
                         if (N == 1) {
-                            System.out.printf("%15d %15s ", averageTime, "na");
+                            System.out.printf("%15d %15s %15s", averageTime, "na", "na");
                         } else {
-                            System.out.printf("%15d %15.3f ", averageTime, (float) averageTime / prevTime[prevTimeLoc]);
+                            System.out.printf("%15d %15.3f %15d", averageTime,
+                                    (float) averageTime / prevTime[prevTimeLoc], ((N * k) / ((N / 2) * k)));
                         }
                         //Update prevTime array
                         prevTime[prevTimeLoc] = averageTime;
@@ -584,21 +556,20 @@ public class Main {
                         System.out.printf("%15s %15s", "na", "na");
                     }
                 }
-                if (N != 1) {
-                    System.out.printf("%15d \n", (N * k) / ((N / 2) * (k / 2)));
-                } else {
-                    System.out.printf("%15s \n", "na");
-                }
+                System.out.printf("\n");
+
+
                 lastTime = getCpuTime() - lastTime;
             }
         }
     }
+
 
     public static void main(String[] args) {
         // write your code here
         if (verificationTesting()) {
             System.out.printf("All tests passed!\n");
         }
-        runTimeTests();
+        //runTimeTests();
     }
 }
