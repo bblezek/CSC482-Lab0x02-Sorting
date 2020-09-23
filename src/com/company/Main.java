@@ -292,7 +292,7 @@ public class Main {
         }
 
         //This loop is for testing successively larger lists
-        for (N = 10; N <= 100000; N = N * 10) {
+        for (N = 10; N <= 10000; N = N * 10) {
             for (k = 6; k <= 48; k = k * 2) {
 
                 //Testing insertion sort
@@ -358,6 +358,12 @@ public class Main {
                 bean.getCurrentThreadCpuTime() : 0L;
     }
 
+    //Calculates log base 2 of N
+    public static float logBaseTwo(int N){
+        float result = ((float) Math.log(N)/ (float) Math.log(2));
+        return result;
+    }
+
     //Function to run timed tests for each search and print table
     public static void runTimeTests() {
         //Looping variables
@@ -384,6 +390,7 @@ public class Main {
 
         //Keeps track of time the last run of k (for N/2) took
         long[] prevTime = {0, 0, 0, 0};
+
 
         //Testing insertion sort times
         System.out.printf("Insertion Sort: \n");
@@ -472,7 +479,7 @@ public class Main {
                 prevTime[prevTimeLoc] = averageTime;
                 prevTimeLoc++;
             }
-            System.out.printf("%15.3f \n", (N * Math.log(N) / ((N / 2) * Math.log(N / 2))));
+            System.out.printf("%15.3f \n", (N * logBaseTwo(N) / ((N / 2) * logBaseTwo(N / 2))));
             lastTime = getCpuTime() - lastTime;
         }
 
